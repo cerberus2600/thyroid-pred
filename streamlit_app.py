@@ -255,7 +255,7 @@ if page == "Prediction":
     <div style='padding: 20px; background-color: #e8f5e9; border-radius: 10px; text-align: center;'>
         <h2 style='color: #2e7d32;'>✅ Predicted Thyroid Condition: <b>{prediction}</b></h2>
     </div>""", unsafe_allow_html=True)
-    st.write("Input DataFrame for Prediction:",input_df)
+        st.write("Input DataFrame for Prediction:",input_df)
 
 
         
