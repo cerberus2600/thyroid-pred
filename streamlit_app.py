@@ -218,7 +218,7 @@ if page == "Prediction":
 
   
     if submit:
-        with open("/content/model_columns.pkl", "rb") as f:
+        with open("model_columns.pkl", "rb") as f:
             model_columns = pickle.load(f)
         def encode_bool(val):
             return 1 if val == "True" else 0
