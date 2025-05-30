@@ -111,6 +111,8 @@ if page == "Prediction":
             age = st.number_input("Age", min_value=0, max_value=100, value=30)
         with col2:
             sex = st.selectbox("Sex", options=["Male", "Female"])
+        with col1:
+            referral_input = st.selectbox("Referral Source", options=['STMW', 'SVHC', 'SVHD', 'SVI', 'WEST', 'other'])
 
         st.markdown("### 💊 Medication & Treatment")
         col1, col2 = st.columns(2)
@@ -222,6 +224,15 @@ if page == "Prediction":
             model_columns = pickle.load(f)
         def encode_bool(val):
             return 1 if val == "True" else 0
+        referral_options = {
+    'STMW': 0,
+    'SVHC': 1,
+    'SVHD': 2,
+    'SVI': 3,
+    'WEST': 4,
+    'other': 5}
+        class_mapping = {0: 'Hyperthyroid', 1: 'Hypothyroid', 2: 'Negative'}
+
         input_dict = {
         "age": age,
         "sex": 1 if sex == "Male" else 0,
@@ -244,8 +255,7 @@ if page == "Prediction":
         "TT4": TT4,
         "T4U": T4U,
         "FTI": FTI,
-        "TBG": 2,
-        "referral_source": "5"
+        "referral_source": referral_options[referral_input]
     }
         input_df = pd.DataFrame([input_dict])  # constructed from user input
         input_df = input_df[model_columns]
@@ -253,7 +263,7 @@ if page == "Prediction":
 
         st.markdown(f"""
     <div style='padding: 20px; background-color: #e8f5e9; border-radius: 10px; text-align: center;'>
-        <h2 style='color: #2e7d32;'>✅ Predicted Thyroid Condition: <b>{prediction}</b></h2>
+        <h2 style='color: #2e7d32;'>✅ Predicted Thyroid Condition: <b>{predicted_label}</b></h2>
     </div>""", unsafe_allow_html=True)
         st.write("Input DataFrame for Prediction:",input_df)
 
