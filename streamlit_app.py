@@ -260,6 +260,8 @@ if page == "Prediction":
         input_df = pd.DataFrame([input_dict])  # constructed from user input
         input_df = input_df[model_columns]
         prediction = model.predict(input_df)[0]
+        predicted_label = class_mapping.get(prediction, "Unknown")
+
 
         st.markdown(f"""
     <div style='padding: 20px; background-color: #e8f5e9; border-radius: 10px; text-align: center;'>
