@@ -1,5 +1,5 @@
 import streamlit as st
-st.set_page_config(page_title="Thyroid Disease Predictor", layout="wide")
+st.set_page_config(page_title="Early Thyroid Detector", layout="wide")
 
 import pandas as pd
 import numpy as np
@@ -76,7 +76,7 @@ page = st.sidebar.selectbox("Choose a page", ["Prediction", "EDA", "About Thyroi
 if page == "Prediction":
     st.markdown("""
     <div style='text-align:center;'>
-        <h1 style='color:#4CAF50;'>🧠 Thyroid Disease Prediction </h1>
+        <h1 style='color:#4CAF50;'>🧠 Early Detection System for Hyperthyroidism </h1>
         <p style='font-size:18px;'>Provide patient information below to predict thyroid condition.</p>
     </div>
     <hr style='border: 1px solid #ddd;'>
