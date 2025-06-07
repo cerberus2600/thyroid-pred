@@ -46,7 +46,7 @@ def load_data():
 
         df['target'] = df['target'].apply(categorize_target)
         df = df[df['target'].isin(['Hyperthyroid', 'Hypothyroid', 'Negative'])]
-        df = df.fillna(df.median(numeric_only=True))
+        #df = df.fillna(df.median(numeric_only=True))
 
         for col in df.columns:
             if df[col].dtype == 'object' and df[col].nunique() == 2:
