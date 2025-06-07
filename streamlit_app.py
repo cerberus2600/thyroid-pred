@@ -380,7 +380,7 @@ elif page == "EDA":
                 )
             
                 st.plotly_chart(fig_gender)
-                  st.markdown(
+                st.markdown(
     """
     <div style='font-size:16px; line-height:1.6; padding-top:10px; color:#333;'>
         <strong>This chart shows the count of thyroid conditions by gender</strong><br>
