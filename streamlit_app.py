@@ -349,45 +349,52 @@ elif page == "EDA":
 
         with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
-            st.write("📊 Preview of 'sex' and 'target':")
+
+            # Preview original columns
+            st.markdown("📄 **Preview of 'sex' and 'target':**")
             st.dataframe(df[['sex', 'target']].head(10))
         
-            # Step 1: Normalize and clean 'sex'
+            # Step 1: Clean the 'sex' column
             df['sex'] = df['sex'].astype(str).str.upper().str.strip()
-            df = df[df['sex'].isin(['F', 'M'])]  # Keep only valid genders
+            df = df[df['sex'].isin(['M', 'F'])]  # Only keep Male/Female
         
-            # Step 2: Map to readable labels
-            df['gender_label'] = df['sex'].map({'F': 'Female', 'M': 'Male'})
-        
-            # Step 3: Ensure target label is clean
+            # Step 2: Clean the 'target' column
             df['target'] = df['target'].astype(str).str.strip().str.title()
             df = df[df['target'].isin(['Negative', 'Hypothyroid', 'Hyperthyroid'])]
         
-            st.write("✅ Cleaned 'sex' and 'target' preview:")
-            st.dataframe(df[['gender_label', 'target']].head(10))
+            # Step 3: Map for display
+            df['gender_label'] = df['sex'].map({'F': 'Female', 'M': 'Male'})
         
-            # Step 4: Group data
+            # Step 4: Grouped counts
             gender_counts = df.groupby(['gender_label', 'target']).size().reset_index(name='count')
         
+            # Preview cleaned data
+            st.markdown("✅ **Cleaned 'sex' and 'target' preview:**")
+            st.dataframe(gender_counts)
+        
+            # Step 5: Plot with Plotly
             if gender_counts.empty:
                 st.warning("⚠️ No data available after filtering. Please check the 'sex' or 'target' column values.")
             else:
-                import matplotlib.pyplot as plt
-                import seaborn as sns
+                import plotly.express as px
         
-                plt.figure(figsize=(10, 6))
-                ax = sns.barplot(data=gender_counts, x='gender_label', y='count', hue='target', palette='Set2')
+                fig4 = px.bar(
+                    gender_counts,
+                    x='gender_label',
+                    y='count',
+                    color='target',
+                    barmode='group',
+                    title="Thyroid Condition Distribution by Gender",
+                    text='count',
+                    labels={'gender_label': 'Gender', 'count': 'Number of Patients', 'target': 'Condition'},
+                    height=600
+                )
+                fig4.update_traces(textposition='outside')
+                fig4.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+                st.plotly_chart(fig4)
         
-                # Add annotations
-                for container in ax.containers:
-                    ax.bar_label(container, fmt='%d', label_type='edge', padding=3)
-        
-                plt.title("Thyroid Condition Distribution by Gender")
-                plt.xlabel("Gender")
-                plt.ylabel("Count")
-                plt.tight_layout()
-        
-                st.pyplot(plt)
+                st.caption("This grouped bar chart shows the number of thyroid condition cases by gender (male/female).")
+
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
             filtered_tt4 = df[df['TT4'] < 300]
