@@ -390,7 +390,6 @@ elif page == "EDA":
     """,
     unsafe_allow_html=True
 )
-                st.caption("This chart shows the count of thyroid conditions by gender, with custom color-coded categories.")
 
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
