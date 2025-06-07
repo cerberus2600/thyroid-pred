@@ -348,38 +348,48 @@ elif page == "EDA":
     unsafe_allow_html=True
 )
 
-        with tab4:
+       with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
-            st.write("🧪 Raw 'sex' column preview (before mapping):")
-            st.write(df['sex'].value_counts(dropna=False))
-            st.write("🔍 Unique values in 'sex':", df['sex'].unique())
-            st.write("🔍 Unique values in 'target':", df['target'].unique())
-            st.write("📊 Sample grouped counts:")
-            st.write(df.groupby(['sex', 'target']).size().reset_index(name='count'))
-
-            # Clean and fill gender properly
+        
+            # Step 1: Clean and prepare the data
             df['sex'] = df['sex'].fillna('Unknown')
             df['sex'] = df['sex'].astype(str).str.upper().str.strip()
-            df['sex'] = df['sex'].map({'F': 0, 'M': 1})
-            st.write("✅ After mapping, unique values in 'sex':", df['sex'].unique())
-
-            # Force proper mapping
-            if df['sex'].dtype != 'int':
-              df['sex'] = df['sex'].map({'M': 1, 'F': 0})
-            df['gender_label'] = df['sex'].map({0: "Female", 1: "Male"})
-            filtered_df = df[df['gender_label'].notna() & df['target'].notna()]
-
-            fig4 = px.histogram(
-        filtered_df,
-        x="gender_label",
-        color="target",
-        barmode="group",
-        title="Thyroid Condition Counts by Gender",
-        height=600)
-
-            st.plotly_chart(fig4)
-            st.caption("This grouped histogram shows how thyroid conditions are distributed across male and female patients.")
-
+            df['sex'] = df['sex'].map({'F': 'Female', 'M': 'Male'})
+        
+            # Drop invalid or unknown entries
+            df2 = df[df['sex'].isin(['Female', 'Male']) & df['target'].notna()].copy()
+            df2 = df2.rename(columns={'target': 'target_category'})
+        
+            # Step 2: Create count plot
+            plt.figure(figsize=(10, 6))
+            ax = sns.countplot(data=df2, x='sex', hue='target_category', palette='Set2')
+        
+            # Step 3: Annotate bars with counts and percentages
+            total_counts = df2['sex'].value_counts()
+        
+            for p in ax.patches:
+                height = p.get_height()
+                gender = p.get_x() + p.get_width() / 2.
+                sex_value = 'Female' if p.get_x() < 0.5 else 'Male'
+                percent = height / total_counts[sex_value] * 100
+        
+                # Annotate percentage
+                ax.annotate(f'{percent:.2f}%', (gender, height + 1),
+                            ha='center', va='center', fontsize=10)
+        
+                # Annotate raw count
+                ax.annotate(f'{int(height)}', (gender, height / 2),
+                            ha='center', va='center', fontsize=10, color='black')
+        
+            # Step 4: Final formatting
+            plt.xlabel("Gender")
+            plt.ylabel("Number of People")
+            plt.title("Thyroid Condition Distribution by Gender")
+            plt.tight_layout()
+        
+            # Step 5: Display in Streamlit
+            st.pyplot(plt)
+            st.caption("This bar chart shows both counts and percentages of thyroid condition classes split by gender.")
 
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
