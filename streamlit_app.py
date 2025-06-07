@@ -351,47 +351,49 @@ elif page == "EDA":
         with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
 
-            # Preview data
-            st.write("📋 Preview of 'sex' and 'target':")
+            # Preview first few rows
+            st.markdown("🧾 **Preview of 'sex' and 'target':**")
             st.dataframe(df[['sex', 'target']].head(10))
         
-            # Clean and map 'sex' column
+            # Clean 'sex' values
+            df['sex'] = df['sex'].fillna('Unknown')
             df['sex'] = df['sex'].astype(str).str.upper().str.strip()
-            df['sex'] = df['sex'].replace('NAN', np.nan)
-            df = df[df['sex'].isin(['F', 'M'])]  # Keep only valid genders
-            df['sex'] = df['sex'].map({'F': 'Female', 'M': 'Male'})  # For readable plot
+            df = df[df['sex'].isin(['F', 'M'])]
         
-            # Preview after cleaning
-            gender_counts = df.groupby(['sex', 'target']).size().reset_index(name='count')
-            st.write("✅ Filtered Gender Counts:")
+            # Map class label
+            df['target_category'] = df['target']
+        
+            # Check if filtered data is valid
+            gender_counts = df.groupby(['sex', 'target_category']).size().reset_index(name='count')
+            st.markdown("✅ **Filtered Gender Counts:**")
             st.dataframe(gender_counts)
         
-            # Check if any data remains
             if gender_counts.empty:
                 st.warning("⚠️ No data available after filtering. Please check the 'sex' or 'target' mappings.")
             else:
-                # Plot using seaborn with percentages
                 import matplotlib.pyplot as plt
                 import seaborn as sns
         
+                # Create figure
                 fig, ax = plt.subplots(figsize=(10, 6))
-                sns.countplot(data=df, x='sex', hue='target', ax=ax)
+                sns.countplot(data=df, x='sex', hue='target_category', ax=ax)
         
-                # Get total counts for each gender
+                # Annotate counts and percentages
                 total_counts = df['sex'].value_counts()
-        
-                # Add annotations (counts and percentages)
                 for p in ax.patches:
                     height = p.get_height()
-                    x = p.get_x() + p.get_width() / 2
-                    gender = p.get_x() < 0.5  # crude method to distinguish left/right
-                    sex_value = 'Female' if p.get_x() < 0.5 else 'Male'
-                    percent = (height / total_counts[sex_value]) * 100
-                    ax.annotate(f'{int(height)}\n{percent:.1f}%', (x, height), ha='center', va='bottom')
+                    gender = p.get_x() + p.get_width() / 2
+                    if p.get_x() < 0.5:
+                        pct = height / total_counts['F'] * 100
+                    else:
+                        pct = height / total_counts['M'] * 100
+                    ax.annotate(f'{pct:.1f}%', (p.get_x() + p.get_width()/2., height + 1), ha='center')
+                    ax.annotate(f'{int(height)}', (p.get_x() + p.get_width()/2., height/2), ha='center')
         
-                ax.set_title("Thyroid Condition Distribution by Gender")
                 ax.set_xlabel("Gender")
                 ax.set_ylabel("Number of People")
+                ax.set_title("Thyroid Condition Distribution by Gender")
+                plt.tight_layout()
                 st.pyplot(fig)
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
