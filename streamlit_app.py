@@ -348,7 +348,7 @@ elif page == "EDA":
     unsafe_allow_html=True
 )
 
-       with tab4:
+        with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
         
             # Step 1: Clean and prepare the data
