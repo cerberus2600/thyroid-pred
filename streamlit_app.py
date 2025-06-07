@@ -350,46 +350,46 @@ elif page == "EDA":
 
         with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
+
+            # Display raw preview
+            st.write("🧪 Preview of 'sex' and 'target':")
+            st.dataframe(df[['sex', 'target']].head(10))
         
-            # Step 1: Clean and prepare the data
+            # Ensure correct mapping
             df['sex'] = df['sex'].fillna('Unknown')
             df['sex'] = df['sex'].astype(str).str.upper().str.strip()
             df['sex'] = df['sex'].map({'F': 'Female', 'M': 'Male'})
         
-            # Drop invalid or unknown entries
+            # Remove unknowns and NaNs
             df2 = df[df['sex'].isin(['Female', 'Male']) & df['target'].notna()].copy()
             df2 = df2.rename(columns={'target': 'target_category'})
         
-            # Step 2: Create count plot
-            plt.figure(figsize=(10, 6))
-            ax = sns.countplot(data=df2, x='sex', hue='target_category', palette='Set2')
+            st.write("✅ Filtered Gender Counts:")
+            st.dataframe(df2[['sex', 'target_category']].value_counts().reset_index(name='count'))
         
-            # Step 3: Annotate bars with counts and percentages
-            total_counts = df2['sex'].value_counts()
+            if df2.empty:
+                st.warning("No data available after filtering. Please check the 'sex' or 'target' mappings.")
+            else:
+                # Plot
+                fig, ax = plt.subplots(figsize=(10, 6))
+                sns.countplot(data=df2, x='sex', hue='target_category', palette='Set2', ax=ax)
         
-            for p in ax.patches:
-                height = p.get_height()
-                gender = p.get_x() + p.get_width() / 2.
-                sex_value = 'Female' if p.get_x() < 0.5 else 'Male'
-                percent = height / total_counts[sex_value] * 100
+                total_counts = df2['sex'].value_counts()
         
-                # Annotate percentage
-                ax.annotate(f'{percent:.2f}%', (gender, height + 1),
-                            ha='center', va='center', fontsize=10)
+                for p in ax.patches:
+                    height = p.get_height()
+                    gender = p.get_x() + p.get_width() / 2.
+                    sex_value = 'Female' if p.get_x() < 0.5 else 'Male'
+                    percent = height / total_counts[sex_value] * 100
         
-                # Annotate raw count
-                ax.annotate(f'{int(height)}', (gender, height / 2),
-                            ha='center', va='center', fontsize=10, color='black')
+                    ax.annotate(f'{percent:.2f}%', (gender, height + 1), ha='center', va='center', fontsize=10)
+                    ax.annotate(f'{int(height)}', (gender, height / 2), ha='center', va='center', fontsize=10)
         
-            # Step 4: Final formatting
-            plt.xlabel("Gender")
-            plt.ylabel("Number of People")
-            plt.title("Thyroid Condition Distribution by Gender")
-            plt.tight_layout()
-        
-            # Step 5: Display in Streamlit
-            st.pyplot(plt)
-            st.caption("This bar chart shows both counts and percentages of thyroid condition classes split by gender.")
+                ax.set_xlabel("Gender")
+                ax.set_ylabel("Number of People")
+                ax.set_title("Thyroid Condition Distribution by Gender")
+                plt.tight_layout()
+                st.pyplot(fig)
 
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
