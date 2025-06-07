@@ -52,7 +52,6 @@ def load_data():
             if df[col].dtype == 'object' and df[col].nunique() == 2:
                 df[col] = df[col].map({'f': 0, 't': 1})
 
-        df['sex'] = df['sex'].map({'F': 0, 'M': 1})
         return df
 
     except Exception as e:
