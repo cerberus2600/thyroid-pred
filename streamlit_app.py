@@ -380,6 +380,16 @@ elif page == "EDA":
                 )
             
                 st.plotly_chart(fig_gender)
+                  st.markdown(
+    """
+    <div style='font-size:16px; line-height:1.6; padding-top:10px; color:#333;'>
+        <strong>This chart shows the count of thyroid conditions by gender</strong><br>
+        Females are more prevalent, which aligns with epidemiological trends in thyroid disorders. <br>
+        To be more profound, the prevalence of hyperthyroidism and hypothyroidism is higher in females compared to males, indicating that females are more likely to develop thyroid conditions.<br>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
                 st.caption("This chart shows the count of thyroid conditions by gender, with custom color-coded categories.")
 
         with tab5:
