@@ -349,6 +349,7 @@ elif page == "EDA":
 
         with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
+            st.dataframe(df.head(20))  # Shows first 20 rows and all columns
 
             # Preview original columns
             st.markdown("📄 **Preview of 'sex' and 'target':**")
