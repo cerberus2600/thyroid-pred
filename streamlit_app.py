@@ -351,49 +351,48 @@ elif page == "EDA":
         with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
 
-            # Preview first few rows
+            # Preview raw data
             st.markdown("🧾 **Preview of 'sex' and 'target':**")
             st.dataframe(df[['sex', 'target']].head(10))
         
-            # Clean 'sex' values
-            df['sex'] = df['sex'].fillna('Unknown')
-            df['sex'] = df['sex'].astype(str).str.upper().str.strip()
-            df = df[df['sex'].isin(['F', 'M'])]
+            # Step 1: Clean sex column
+            df_clean = df.copy()
+            df_clean['sex'] = df_clean['sex'].astype(str).str.upper().str.strip()
+            df_clean = df_clean[df_clean['sex'].isin(['M', 'F'])]  # Keep only valid values
         
-            # Map class label
-            df['target_category'] = df['target']
+            # Step 2: Ensure 'target' is valid
+            valid_targets = ['Negative', 'Hyperthyroid', 'Hypothyroid']
+            df_clean = df_clean[df_clean['target'].isin(valid_targets)]
         
-            # Check if filtered data is valid
-            gender_counts = df.groupby(['sex', 'target_category']).size().reset_index(name='count')
-            st.markdown("✅ **Filtered Gender Counts:**")
-            st.dataframe(gender_counts)
+            # Step 3: Check again
+            st.markdown("✅ **Cleaned 'sex' and 'target' preview:**")
+            st.dataframe(df_clean[['sex', 'target']].head(10))
         
-            if gender_counts.empty:
-                st.warning("⚠️ No data available after filtering. Please check the 'sex' or 'target' mappings.")
+            # Step 4: Grouped counts
+            group_df = df_clean.groupby(['sex', 'target']).size().reset_index(name='count')
+        
+            if group_df.empty:
+                st.warning("⚠️ No data available after filtering. Please check the 'sex' or 'target' column values.")
             else:
                 import matplotlib.pyplot as plt
                 import seaborn as sns
         
-                # Create figure
                 fig, ax = plt.subplots(figsize=(10, 6))
-                sns.countplot(data=df, x='sex', hue='target_category', ax=ax)
+                sns.countplot(data=df_clean, x='sex', hue='target', ax=ax)
         
-                # Annotate counts and percentages
-                total_counts = df['sex'].value_counts()
+                # Annotate bars
+                total_counts = df_clean['sex'].value_counts()
                 for p in ax.patches:
                     height = p.get_height()
-                    gender = p.get_x() + p.get_width() / 2
-                    if p.get_x() < 0.5:
-                        pct = height / total_counts['F'] * 100
-                    else:
-                        pct = height / total_counts['M'] * 100
-                    ax.annotate(f'{pct:.1f}%', (p.get_x() + p.get_width()/2., height + 1), ha='center')
-                    ax.annotate(f'{int(height)}', (p.get_x() + p.get_width()/2., height/2), ha='center')
+                    sex = 'F' if p.get_x() < 0.5 else 'M'
+                    pct = height / total_counts[sex] * 100
+                    ax.annotate(f'{height}\n({pct:.1f}%)', 
+                                (p.get_x() + p.get_width() / 2., height + 5), 
+                                ha='center', fontsize=9)
         
                 ax.set_xlabel("Gender")
-                ax.set_ylabel("Number of People")
-                ax.set_title("Thyroid Condition Distribution by Gender")
-                plt.tight_layout()
+                ax.set_ylabel("Number of Patients")
+                ax.set_title("Thyroid Diagnosis Distribution by Gender")
                 st.pyplot(fig)
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
