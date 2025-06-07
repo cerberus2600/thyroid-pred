@@ -47,7 +47,10 @@ def load_data():
         df['target'] = df['target'].apply(categorize_target)
         df = df[df['target'].isin(['Hyperthyroid', 'Hypothyroid', 'Negative'])]
         #df = df.fillna(df.median(numeric_only=True))
-
+        if 'sex' in df.columns:
+            df['sex'] = df['sex'].fillna('Unknown')
+            df['sex'] = df['sex'].astype(str).str.upper().str.strip()
+            df['sex'] = df['sex'].map({'F': 0, 'M': 1, 'UNKNOWN': np.nan})  # optional: leave unknowns as NaN
         for col in df.columns:
             if df[col].dtype == 'object' and df[col].nunique() == 2:
                 df[col] = df[col].map({'f': 0, 't': 1})
