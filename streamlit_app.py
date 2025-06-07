@@ -51,8 +51,7 @@ def load_data():
         for col in df.columns:
             if df[col].dtype == 'object' and df[col].nunique() == 2:
                 df[col] = df[col].map({'f': 0, 't': 1})
-        df['sex'] = df['sex'].astype(str).str.upper().str.strip()  # Normalize values
-        df = df[df['sex'].isin(['F', 'M'])]  # Keep only valid
+       
         return df
 
     except Exception as e:
