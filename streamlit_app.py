@@ -349,50 +349,45 @@ elif page == "EDA":
 
         with tab4:
             st.subheader("Thyroid Diagnosis Distribution by Gender")
-
-            # Preview raw data
-            st.markdown("🧾 **Preview of 'sex' and 'target':**")
+            st.write("📊 Preview of 'sex' and 'target':")
             st.dataframe(df[['sex', 'target']].head(10))
         
-            # Step 1: Clean sex column
-            df_clean = df.copy()
-            df_clean['sex'] = df_clean['sex'].astype(str).str.upper().str.strip()
-            df_clean = df_clean[df_clean['sex'].isin(['M', 'F'])]  # Keep only valid values
+            # Step 1: Normalize and clean 'sex'
+            df['sex'] = df['sex'].astype(str).str.upper().str.strip()
+            df = df[df['sex'].isin(['F', 'M'])]  # Keep only valid genders
         
-            # Step 2: Ensure 'target' is valid
-            valid_targets = ['Negative', 'Hyperthyroid', 'Hypothyroid']
-            df_clean = df_clean[df_clean['target'].isin(valid_targets)]
+            # Step 2: Map to readable labels
+            df['gender_label'] = df['sex'].map({'F': 'Female', 'M': 'Male'})
         
-            # Step 3: Check again
-            st.markdown("✅ **Cleaned 'sex' and 'target' preview:**")
-            st.dataframe(df_clean[['sex', 'target']].head(10))
+            # Step 3: Ensure target label is clean
+            df['target'] = df['target'].astype(str).str.strip().str.title()
+            df = df[df['target'].isin(['Negative', 'Hypothyroid', 'Hyperthyroid'])]
         
-            # Step 4: Grouped counts
-            group_df = df_clean.groupby(['sex', 'target']).size().reset_index(name='count')
+            st.write("✅ Cleaned 'sex' and 'target' preview:")
+            st.dataframe(df[['gender_label', 'target']].head(10))
         
-            if group_df.empty:
+            # Step 4: Group data
+            gender_counts = df.groupby(['gender_label', 'target']).size().reset_index(name='count')
+        
+            if gender_counts.empty:
                 st.warning("⚠️ No data available after filtering. Please check the 'sex' or 'target' column values.")
             else:
                 import matplotlib.pyplot as plt
                 import seaborn as sns
         
-                fig, ax = plt.subplots(figsize=(10, 6))
-                sns.countplot(data=df_clean, x='sex', hue='target', ax=ax)
+                plt.figure(figsize=(10, 6))
+                ax = sns.barplot(data=gender_counts, x='gender_label', y='count', hue='target', palette='Set2')
         
-                # Annotate bars
-                total_counts = df_clean['sex'].value_counts()
-                for p in ax.patches:
-                    height = p.get_height()
-                    sex = 'F' if p.get_x() < 0.5 else 'M'
-                    pct = height / total_counts[sex] * 100
-                    ax.annotate(f'{height}\n({pct:.1f}%)', 
-                                (p.get_x() + p.get_width() / 2., height + 5), 
-                                ha='center', fontsize=9)
+                # Add annotations
+                for container in ax.containers:
+                    ax.bar_label(container, fmt='%d', label_type='edge', padding=3)
         
-                ax.set_xlabel("Gender")
-                ax.set_ylabel("Number of Patients")
-                ax.set_title("Thyroid Diagnosis Distribution by Gender")
-                st.pyplot(fig)
+                plt.title("Thyroid Condition Distribution by Gender")
+                plt.xlabel("Gender")
+                plt.ylabel("Count")
+                plt.tight_layout()
+        
+                st.pyplot(plt)
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
             filtered_tt4 = df[df['TT4'] < 300]
