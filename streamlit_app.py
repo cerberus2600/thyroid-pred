@@ -277,17 +277,19 @@ if page == "Prediction":
 elif page == "EDA":
     st.title("Exploratory Data Analysis (EDA)")
 
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "Class Distribution",
         "Age Distribution",
         "TSH Levels",
         "Sex Distribution",
         "TT4 Levels",
-        "Correlation Heatmap"
+        "Correlation Heatmap",
+        "All Feature Correlation"  # New Tab
+
     ])
 
     if df is None or df.empty:
-        for tab in [tab1, tab2, tab3, tab4, tab5, tab6]:
+        for tab in [tab1, tab2, tab3, tab4, tab5, tab6, tab7]:
             with tab:
                 st.warning("EDA cannot be shown because the dataset is not loaded or is empty.")
     else:
@@ -407,6 +409,22 @@ elif page == "EDA":
             sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax)
             st.pyplot(fig6)
             st.caption("This heatmap shows correlation between different thyroid-related lab values. Strong correlation indicates shared diagnostic significance.")
+        with tab7:
+            st.subheader("Correlation Heatmap of All Features")
+        
+            # Drop non-numeric columns if any
+            numeric_df = df.select_dtypes(include=[np.number])
+        
+            # Calculate correlation
+            corr_matrix = numeric_df.corr()
+        
+            # Plot
+            fig_all, ax_all = plt.subplots(figsize=(16, 12))
+            sns.heatmap(corr_matrix, annot=False, cmap='coolwarm', linewidths=0.5, ax=ax_all)
+            ax_all.set_title("Correlation Heatmap of All Numerical Features")
+            st.pyplot(fig_all)
+        
+            st.caption("This heatmap visualizes pairwise correlations between all numerical features in the dataset.")
 
 elif page == "About Thyroid":
     st.markdown("""
