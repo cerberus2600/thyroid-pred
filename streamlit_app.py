@@ -351,34 +351,36 @@ elif page == "EDA":
 )
 
         with tab4:
-            st.subheader("Thyroid Diagnosis Distribution by Gender")
+                st.subheader("Thyroid Diagnosis Distribution by Gender")
 
-            # Map 0 and 1 to readable labels
-            df['gender_label'] = df['sex'].map({0: 'Female', 1: 'Male'})
-        
-            # Grouped count data
-            gender_target_counts = df.groupby(['gender_label', 'target']).size().reset_index(name='count')
-
-             # Define custom colors
-            custom_colors = {
-                'Negative': '#ADD8E6',      # Light Blue
-                'Hypothyroid': '#00008B',   # Dark Blue
-                'Hyperthyroid': '#FF0000'   # Red
-            }
-            # Plotly grouped bar chart
-            fig_gender = px.bar(
-                gender_target_counts,
-                x='gender_label',
-                y='count',
-                color='target',
-                barmode='group',
-                title='Thyroid Condition Distribution by Gender',
-                labels={'gender_label': 'Gender', 'count': 'Patient Count', 'target': 'Diagnosis'},
-                height=600
-            )
-        
-            st.plotly_chart(fig_gender)
-            st.caption("This grouped bar chart shows the number of male and female patients diagnosed with each thyroid condition.")
+                # Map 0 and 1 to labels
+                df['gender_label'] = df['sex'].map({0: 'Female', 1: 'Male'})
+            
+                # Group counts
+                gender_target_counts = df.groupby(['gender_label', 'target']).size().reset_index(name='count')
+            
+                # Define custom colors
+                custom_colors = {
+                    'Negative': '#ADD8E6',      # Light Blue
+                    'Hypothyroid': '#00008B',   # Dark Blue
+                    'Hyperthyroid': '#FF0000'   # Red
+                }
+            
+                # Create plotly chart
+                fig_gender = px.bar(
+                    gender_target_counts,
+                    x='gender_label',
+                    y='count',
+                    color='target',
+                    barmode='group',
+                    title='Thyroid Condition Distribution by Gender',
+                    labels={'gender_label': 'Gender', 'count': 'Patient Count', 'target': 'Diagnosis'},
+                    color_discrete_map=custom_colors,
+                    height=600
+                )
+            
+                st.plotly_chart(fig_gender)
+                st.caption("This chart shows the count of thyroid conditions by gender, with custom color-coded categories.")
 
         with tab5:
             st.subheader("TT4 Levels by Diagnosis")
