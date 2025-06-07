@@ -358,7 +358,13 @@ elif page == "EDA":
         
             # Grouped count data
             gender_target_counts = df.groupby(['gender_label', 'target']).size().reset_index(name='count')
-        
+
+             # Define custom colors
+            custom_colors = {
+                'Negative': '#ADD8E6',      # Light Blue
+                'Hypothyroid': '#00008B',   # Dark Blue
+                'Hyperthyroid': '#FF0000'   # Red
+            }
             # Plotly grouped bar chart
             fig_gender = px.bar(
                 gender_target_counts,
