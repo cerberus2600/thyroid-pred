@@ -410,7 +410,7 @@ elif page == "EDA":
             st.pyplot(fig6)
             st.caption("This heatmap shows correlation between different thyroid-related lab values. Strong correlation indicates shared diagnostic significance.")
         with tab7:
-            sst.subheader("Correlation Heatmap of All Features")
+            st.subheader("Correlation Heatmap of All Features")
 
             # Show all column names
             st.write("📋 **Columns in the Dataset:**")
