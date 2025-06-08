@@ -420,6 +420,26 @@ elif page == "EDA":
             # Drop non-numeric columns if any
             numeric_df = df.select_dtypes(include=[np.number])
             
+            # Drop specific measured columns
+            columns_to_remove = [
+                "TSH_measured", "T3_measured", "TT4_measured",
+                "T4U_measured", "FTI_measured", "TBG_measured"
+            ]
+            numeric_df = numeric_df.drop(columns=[col for col in columns_to_remove if col in numeric_df.columns], errors='ignore')
+            
+            # Ensure referral_source and target are included
+            if 'referral_source' in df.columns and 'referral_source' not in numeric_df.columns:
+                numeric_df['referral_source'] = df['referral_source']
+            
+            if 'target' in df.columns and 'target' not in numeric_df.columns:
+                # Encode target if it's categorical
+                if df['target'].dtype == 'object':
+                    from sklearn.preprocessing import LabelEncoder
+                    le = LabelEncoder()
+                    numeric_df['target'] = le.fit_transform(df['target'])
+                else:
+                    numeric_df['target'] = df['target']
+            
             # Calculate correlation
             corr_matrix = numeric_df.corr()
             
@@ -428,8 +448,8 @@ elif page == "EDA":
             sns.heatmap(corr_matrix, annot=False, cmap='coolwarm', linewidths=0.5, ax=ax_all)
             ax_all.set_title("Correlation Heatmap of All Numerical Features")
             st.pyplot(fig_all)
-            
-            st.caption("This heatmap visualizes pairwise correlations between all numerical features in the dataset.")
+
+
 elif page == "About Thyroid":
     st.markdown("""
 <style>
