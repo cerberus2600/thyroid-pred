@@ -412,10 +412,6 @@ elif page == "EDA":
         with tab7:
             st.subheader("Correlation Heatmap of All Features")
 
-            # Show all column names
-            st.write("📋 **Columns in the Dataset:**")
-            st.markdown("### 🩺 Clinical Indicators")
-            st.write(df.columns.tolist())
             
             # Drop non-numeric columns and specified irrelevant columns
             columns_to_remove = [
