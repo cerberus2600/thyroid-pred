@@ -411,21 +411,24 @@ elif page == "EDA":
             st.caption("This heatmap shows correlation between different thyroid-related lab values. Strong correlation indicates shared diagnostic significance.")
         with tab7:
             st.subheader("Correlation Heatmap of All Features")
-        
+
+            # Show all column names
+            st.write("📋 **Columns in the Dataset:**")
+            st.write(df.columns.tolist())
+            
             # Drop non-numeric columns if any
             numeric_df = df.select_dtypes(include=[np.number])
-        
+            
             # Calculate correlation
             corr_matrix = numeric_df.corr()
-        
+            
             # Plot
             fig_all, ax_all = plt.subplots(figsize=(16, 12))
             sns.heatmap(corr_matrix, annot=False, cmap='coolwarm', linewidths=0.5, ax=ax_all)
             ax_all.set_title("Correlation Heatmap of All Numerical Features")
             st.pyplot(fig_all)
-        
+            
             st.caption("This heatmap visualizes pairwise correlations between all numerical features in the dataset.")
-
 elif page == "About Thyroid":
     st.markdown("""
 <style>
