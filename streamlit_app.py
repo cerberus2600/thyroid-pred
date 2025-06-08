@@ -414,6 +414,7 @@ elif page == "EDA":
 
             # Show all column names
             st.write("📋 **Columns in the Dataset:**")
+            st.markdown("### 🩺 Clinical Indicators")
             st.write(df.columns.tolist())
             
             # Drop non-numeric columns if any
