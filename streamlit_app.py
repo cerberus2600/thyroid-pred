@@ -410,44 +410,45 @@ elif page == "EDA":
             st.pyplot(fig6)
             st.caption("This heatmap shows correlation between different thyroid-related lab values. Strong correlation indicates shared diagnostic significance.")
         with tab7:
-            st.subheader("Correlation Heatmap of All Features")
+            sst.subheader("Correlation Heatmap of All Features")
 
             # Show all column names
             st.write("📋 **Columns in the Dataset:**")
             st.markdown("### 🩺 Clinical Indicators")
             st.write(df.columns.tolist())
             
-            # Drop non-numeric columns if any
-            numeric_df = df.select_dtypes(include=[np.number])
-            
-            # Drop specific measured columns
+            # Drop non-numeric columns and specified irrelevant columns
             columns_to_remove = [
                 "TSH_measured", "T3_measured", "TT4_measured",
                 "T4U_measured", "FTI_measured", "TBG_measured"
             ]
-            numeric_df = numeric_df.drop(columns=[col for col in columns_to_remove if col in numeric_df.columns], errors='ignore')
             
-            # Ensure referral_source and target are included
-            if 'referral_source' in df.columns and 'referral_source' not in numeric_df.columns:
-                numeric_df['referral_source'] = df['referral_source']
+            # Create a copy to avoid modifying original
+            df_corr = df.drop(columns=[col for col in columns_to_remove if col in df.columns], errors='ignore').copy()
             
-            if 'target' in df.columns and 'target' not in numeric_df.columns:
-                # Encode target if it's categorical
-                if df['target'].dtype == 'object':
-                    from sklearn.preprocessing import LabelEncoder
-                    le = LabelEncoder()
-                    numeric_df['target'] = le.fit_transform(df['target'])
-                else:
-                    numeric_df['target'] = df['target']
+            # Encode referral_source if it's categorical
+            if 'referral_source' in df_corr.columns and df_corr['referral_source'].dtype == 'object':
+                df_corr['referral_source'] = df_corr['referral_source'].astype('category').cat.codes
             
-            # Calculate correlation
+            # Encode target if it's categorical
+            if 'target' in df_corr.columns and df_corr['target'].dtype == 'object':
+                from sklearn.preprocessing import LabelEncoder
+                le = LabelEncoder()
+                df_corr['target'] = le.fit_transform(df_corr['target'])
+            
+            # Select numeric columns
+            numeric_df = df_corr.select_dtypes(include=[np.number])
+            
+            # Compute correlation
             corr_matrix = numeric_df.corr()
             
-            # Plot
+            # Plot heatmap
             fig_all, ax_all = plt.subplots(figsize=(16, 12))
             sns.heatmap(corr_matrix, annot=False, cmap='coolwarm', linewidths=0.5, ax=ax_all)
             ax_all.set_title("Correlation Heatmap of All Numerical Features")
             st.pyplot(fig_all)
+            
+            st.caption("This heatmap visualizes pairwise correlations between all numerical features in the dataset, including referral source and encoded target.")
 
 
 elif page == "About Thyroid":
